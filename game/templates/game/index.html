@@ -4,11 +4,11 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>P4 Drawing</title>
+    <title>P4 Game</title>
 
-    <link rel="stylesheet" type="text/css" href="{% static 'draw/vendor/bootstrap/css/bootstrap.min.css' %}">
-    <script type="text/javascript" src="{% static 'draw/vendor/jquery/jquery-3.3.1.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'draw/vendor/paper/paper-full.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'game/vendor/bootstrap/css/bootstrap.min.css' %}">
+    <script type="text/javascript" src="{% static 'game/vendor/jquery/jquery-3.3.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'game/vendor/paper/paper-full.min.js' %}"></script>
 
     <style type="text/css">
     </style>
@@ -39,7 +39,7 @@
     const size = urlParams.get('size');
 
     var socket = new WebSocket(
-        'ws://' + window.location.host + '/ws/draw');
+        'ws://' + window.location.host + '/ws/game');
 
     tool.onMouseMove = function(event) { //http://paperjs.org/reference/tool/ path examples
       if (size=="small") {
