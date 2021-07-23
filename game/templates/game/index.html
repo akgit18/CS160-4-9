@@ -11,28 +11,45 @@
     <script type="text/javascript" src="{% static 'game/vendor/paper/paper-full.min.js' %}"></script>
 
     <style type="text/css">
+      input {
+        width: 5.8vh;
+        height: 5.8vh;
+        text-align: center;
+        padding: 0px;
+        font-size: 5vh;
+      }
     </style>
 
 </head>
 <body>
     <!-- You may change the dimensions of this canvas -->
-    <canvas id="myCanvas" width="750px" height="750px"></canvas>
+    <!-- <canvas id="myCanvas" width="750px" height="750px"></canvas> -->
+    <table>
+      <tbody>
+        {% for i in range %}
+          <tr>
+            {% for j in range %}
+              <td>
+                <input type="text" maxlength="1" value="" id="{{forloop.parentloop.counter0}}, {{forloop.counter0}}" class="text-uppercase text-center">
+              </td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 </body>
-<script>
 
-    // setting up the canvas and one paper tool
+<!-- <script>
+
     var canvas = document.getElementById('myCanvas');
     paper.setup(canvas);
     var tool = new paper.Tool();
     var uid = Date.now() % 10000;
     var paths = {};
     paths[uid] = new paper.Path()
-    // function uid2color() {
-    //
-    // }
+
     var randColor = "#"+((Math.round(Math.random()*16777215)).toString(16));
     paths[uid].strokeColor = randColor;
-    // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
     // https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
     const urlParams = new URLSearchParams(window.location.search);
@@ -44,7 +61,6 @@
     tool.onMouseMove = function(event) { //http://paperjs.org/reference/tool/ path examples
       if (size=="small") {
         paths[uid].add(event.point);
-        // You may need to add code here if you want to pass any other information.
         socket.send(JSON.stringify({
          "x" : event.point.x,
          "y" : event.point.y,
@@ -57,7 +73,6 @@
     socket.onmessage = function(receivedMessage) {
         var received = JSON.parse(receivedMessage.data);
         console.log("Received: " + JSON.stringify(received));
-        // You will probably want to add some code here to draw more lines.
         if (size == "large") {
           if (!paths[received.uid]) {
             paths[received.uid] = new paper.Path();
@@ -71,5 +86,5 @@
         console.error('Chat socket closed unexpectedly');
     };
 
-</script>
+</script> -->
 </html>
