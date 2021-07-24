@@ -17,26 +17,42 @@
         text-align: center;
         padding: 0px;
         font-size: 5vh;
+        background-color: transparent;
+      }
+      table {
+        background-image: url("{% static 'game/images/img5.svg' %}");
+        background-repeat: no-repeat;
+        /* background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Blank_Scrabble_board_with_coordinates.svg/1200px-Blank_Scrabble_board_with_coordinates.svg.png"); */
       }
     </style>
 
 </head>
-<body>
+<body onload="$('input:text').val('')">
     <!-- You may change the dimensions of this canvas -->
     <!-- <canvas id="myCanvas" width="750px" height="750px"></canvas> -->
-    <table>
-      <tbody>
-        {% for i in range %}
-          <tr>
-            {% for j in range %}
-              <td>
-                <input type="text" maxlength="1" value="" id="{{forloop.parentloop.counter0}}, {{forloop.counter0}}" class="text-uppercase text-center">
-              </td>
-            {% endfor %}
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="container-fluid m2-" style="width:100%">
+      <div class="row align-items-center">
+        <div class="col-9">
+          <table style='float:right'>
+            <tbody>
+              {% for i in range %}
+                <tr>
+                  {% for j in range %}
+                    <td>
+                      <input type="text" maxlength="1" value="" id="{{forloop.parentloop.counter0}}, {{forloop.counter0}}" class="text-uppercase text-center">
+                    </td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-3 align-items-center">
+          <button type="button" name="button" style="width:100%">a</button>
+        </div>
+      </div>
+    </div>
 </body>
 
 <!-- <script>

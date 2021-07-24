@@ -3,7 +3,7 @@ from django.shortcuts import render
 
 def index(request):
 
-    return render(request, 'game/index.html', context={'range': range(17)})
+    return render(request, 'game/index.html', context={'range': range(15)})
 
 def room(request, room_name):
     return render(request, 'game/room.html', {
