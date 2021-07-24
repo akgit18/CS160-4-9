@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'game/vendor/bootstrap/css/bootstrap.min.css' %}">
     <script type="text/javascript" src="{% static 'game/vendor/jquery/jquery-3.3.1.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'game/vendor/paper/paper-full.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'game/js/scoring.js' %}"></script>
 
     <style type="text/css">
       input {
@@ -17,12 +18,16 @@
         text-align: center;
         padding: 0px;
         font-size: 5vh;
-        background-color: transparent;
+        background-color: rgba(222,184,135,0.4);
+        /* background-color: transparent; */
       }
       table {
         background-image: url("{% static 'game/images/img5.svg' %}");
         background-repeat: no-repeat;
         /* background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Blank_Scrabble_board_with_coordinates.svg/1200px-Blank_Scrabble_board_with_coordinates.svg.png"); */
+      }
+      body {
+        background-color: #deb887;
       }
     </style>
 
@@ -32,7 +37,7 @@
     <!-- <canvas id="myCanvas" width="750px" height="750px"></canvas> -->
     <div class="container-fluid m2-" style="width:100%">
       <div class="row align-items-center">
-        <div class="col-9">
+        <div class="col-9 mt-3">
           <table style='float:right'>
             <tbody>
               {% for i in range %}
@@ -48,24 +53,27 @@
           </table>
         </div>
 
-        <div class="col-3 align-items-center">
-          <button type="button" name="button" style="width:100%">a</button>
+        <div class="col-3 mt-3 align-items-center">
+          <button class="btn btn-success my-2" style="width:100%">a</button>
+          <button class="btn btn-success my-2" style="width:100%">b</button>
+          <button class="btn btn-success my-2" style="width:100%">c</button>
+          <button class="btn btn-success my-2" style="width:100%">d</button>
         </div>
       </div>
     </div>
 </body>
 
-<!-- <script>
+<script>
 
-    var canvas = document.getElementById('myCanvas');
-    paper.setup(canvas);
-    var tool = new paper.Tool();
+    // var canvas = document.getElementById('myCanvas');
+    // paper.setup(canvas);
+    // var tool = new paper.Tool();
     var uid = Date.now() % 10000;
-    var paths = {};
-    paths[uid] = new paper.Path()
+    // var paths = {};
+    // paths[uid] = new paper.Path()
 
-    var randColor = "#"+((Math.round(Math.random()*16777215)).toString(16));
-    paths[uid].strokeColor = randColor;
+    // var randColor = "#"+((Math.round(Math.random()*16777215)).toString(16));
+    // paths[uid].strokeColor = randColor;
     var url = window.location.href;
     // https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
     const urlParams = new URLSearchParams(window.location.search);
@@ -74,27 +82,31 @@
     var socket = new WebSocket(
         'ws://' + window.location.host + '/ws/game');
 
-    tool.onMouseMove = function(event) { //http://paperjs.org/reference/tool/ path examples
-      if (size=="small") {
-        paths[uid].add(event.point);
-        socket.send(JSON.stringify({
-         "x" : event.point.x,
-         "y" : event.point.y,
-         "uid" : uid,
-         "col" : randColor
-        }));
-      }
-    }
+    // tool.onMouseMove = function(event) { //http://paperjs.org/reference/tool/ path examples
+    //   if (size=="small") {
+    //     paths[uid].add(event.point);
+    //     socket.send(JSON.stringify({
+    //      "uid" : uid
+    //     }));
+    //   }
+    // }
 
     socket.onmessage = function(receivedMessage) {
         var received = JSON.parse(receivedMessage.data);
         console.log("Received: " + JSON.stringify(received));
-        if (size == "large") {
-          if (!paths[received.uid]) {
-            paths[received.uid] = new paper.Path();
-            paths[received.uid].strokeColor = received.col;
-          }
-          paths[received.uid].add(received.x, received.y);
+        // code 1: new user joins
+        // code 2:
+        // code 3:
+        // code 4:
+        if (received.code == 1) {
+
+          console.log("User " + received.uid + " joined. Added to team ")
+        } else if (received.code == 2) {
+          console.log("a")
+        } else if (received.code == 3) {
+          console.log("a")
+        } else if (received.code == 4) {
+          console.log("a")
         }
     }
 
@@ -102,5 +114,5 @@
         console.error('Chat socket closed unexpectedly');
     };
 
-</script> -->
+</script>
 </html>
