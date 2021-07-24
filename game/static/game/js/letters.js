@@ -84,3 +84,29 @@ const freqdict = {
   "Y": 2,
   "Z": 1
 }
+
+function placeword(word, i, j, dir) {
+  // 1 = downward, 0 = rightward
+  let wordscore=0;
+  if (dir) {
+    for (letter of word) {
+      document.getElementById(i+","+j).value = letter;
+      i++;
+      wordscore+=pointsdict[letter.toUpperCase()];
+    }
+  } else {
+    for (letter of word) {
+      document.getElementById(i+","+j).value = letter;
+      j++;
+      wordscore+=pointsdict[letter.toUpperCase()];
+    }
+  }
+  update_score(wordscore, current_team);
+}
+
+var score = [0,0];
+var current_team = 0;
+function update_score(points, team) {
+  score[team] += points;
+  console.log(score);
+}
