@@ -9,7 +9,6 @@
     <link rel="stylesheet" type="text/css" href="{% static 'game/vendor/bootstrap/css/bootstrap.min.css' %}">
     <script type="text/javascript" src="{% static 'game/vendor/jquery/jquery-3.3.1.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'game/vendor/paper/paper-full.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'game/js/letters.js' %}"></script>
 
     <style type="text/css">
       input {
@@ -19,6 +18,7 @@
         padding: 0px;
         font-size: 5vh;
         background-color: rgba(222,184,135,0.4);
+        border: 0px;
         /* background-color: transparent; */
       }
       table {
@@ -28,10 +28,70 @@
       body {
         background-color: #deb887;
       }
-    </style>
+      .time-sq {
 
+      }
+    </style>
+    <style type="text/css">
+      .base-timer {
+        position: relative;
+        width: 300px;
+        height: 300px;
+      }
+
+      .base-timer__svg {
+      transform: scaleX(-1);
+      }
+
+      .base-timer__circle {
+      fill: none;
+      stroke: none;
+      }
+
+      .base-timer__path-elapsed {
+      stroke-width: 7px;
+      stroke: grey;
+      }
+
+      .base-timer__path-remaining {
+      stroke-width: 7px;
+      stroke-linecap: round;
+      transform: rotate(90deg);
+      transform-origin: center;
+      transition: 1s linear all;
+      fill-rule: nonzero;
+      stroke: currentColor;
+      }
+
+      .base-timer__path-remaining.green {
+      color: #5cb85c;
+      }
+
+      .base-timer__path-remaining.orange {
+      color: orange;
+      }
+
+      .base-timer__path-remaining.red {
+      color: red;
+      }
+
+      .base-timer__label {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      }
+      #app {
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
 </head>
-<body onload="$('input:text').val('')">
+<body onload="$('.scrabble-sq').val('')">
 <!-- <body> -->
     <!-- You may change the dimensions of this canvas -->
     <!-- <canvas id="myCanvas" width="750px" height="750px"></canvas> -->
@@ -44,7 +104,7 @@
                 <tr>
                   {% for j in range %}
                     <td>
-                      <input type="text" maxlength="1" value="" id="{{forloop.parentloop.counter0}},{{forloop.counter0}}" class="text-uppercase text-center">
+                      <input type="text" maxlength="1" value="" id="{{forloop.parentloop.counter0}},{{forloop.counter0}}" class="text-uppercase text-center scrabble-sq">
                     </td>
                   {% endfor %}
                 </tr>
@@ -54,25 +114,40 @@
         </div>
 
         <div class="col-3 mt-3 align-items-center">
-          <button class="btn btn-success my-2" style="width:100%">a</button>
-          <button class="btn btn-success my-2" style="width:100%">b</button>
+          <!-- <span class="text-lg" style="font-size: 5vh;">
+            <input type="text" value="0" class="timer-sq" id="min2">
+            <input type="text" value="2" class="timer-sq" id="min1">
+            :
+            <input type="text" value="3" class="timer-sq" id="sec2">
+            <input type="text" value="0" class="timer-sq" id="sec1">
+          </span> -->
+          <div id="app" style="float:center">
+
+          </div>
+          <button id="timebtn" class="btn btn-success my-2" style="width:100%" onClick="startTimer()">Start Timer</button>
+          <div class="">
+            <h3 style="float:left">Team 1</h3>
+            <h3 id="1p" style="float:right">Points: 0</h3>
+          </div>
           <button class="btn btn-success my-2" style="width:100%">c</button>
           <button class="btn btn-success my-2" style="width:100%">d</button>
+          <div class="">
+            <h3 style="float:left">Team 2</h3>
+            <h3 id="2p" style="float:right">Points: 0</h3>
+          </div>
         </div>
       </div>
     </div>
 </body>
-
+<script type="text/javascript" src="{% static 'game/js/letters.js' %}"></script>
+<script type="text/javascript" src="{% static 'game/js/timer.js' %}"></script>
 <script>
 
-    // var canvas = document.getElementById('myCanvas');
-    // paper.setup(canvas);
-    // var tool = new paper.Tool();
+
     var uid = Date.now() % 10000;
     const teams = {};
     const teampops = [0,0];
-    // var paths = {};
-    // paths[uid] = new paper.Path()
+    var current_team = 0;
 
     // var randColor = "#"+((Math.round(Math.random()*16777215)).toString(16));
     // paths[uid].strokeColor = randColor;
@@ -93,6 +168,18 @@
     //   }
     // }
 
+    // function startTimer() {
+    //   let min2 = Number(document.getElementById('min2')) * 600000;
+    //   let min1 = Number(document.getElementById('min1')) * 60000;
+    //   let sec1 = Number(document.getElementById('sec1')) * 1000;
+    //   let sec2 = Number(document.getElementById('sec2')) * 10000;
+    //   let t = min2 + min1 + sec2 + sec1;
+    //   // Create an animation callback every second:
+    //   animationInterval(1000, controller.signal, time => {
+    //     console.log('tick!', time);
+    //   });
+    // }
+
     socket.onmessage = function(receivedMessage) {
         var received = JSON.parse(receivedMessage.data);
         console.log("Received: " + JSON.stringify(received));
@@ -100,6 +187,8 @@
         // code 2: team puts word
         // code 3: user sets name
         // code 4: user changes team
+        // code 5: user finishes turn
+        // code 6: game start
         if (received.code == 1) {
           if (teampops[0] <= teampops[1]) {
             teams[received.uid] =  0;
@@ -121,6 +210,11 @@
           console.log("a")
         } else if (received.code == 4) {
           let t1 = teams[received.uid];
+        } else if (received.code == 5) {
+          let t1 = teams[received.uid];
+        } else if (received.code == 6) {
+          console.log("Starting Game");
+          startTimer();
         }
     }
 

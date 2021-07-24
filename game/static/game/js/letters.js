@@ -108,5 +108,6 @@ var score = [0,0];
 var current_team = 0;
 function update_score(points, team) {
   score[team] += points;
+  document.getElementById(current_team+1+"p").innerHTML = "Points: " + score[team];
   console.log(score);
 }
