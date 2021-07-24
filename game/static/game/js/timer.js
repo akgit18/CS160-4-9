@@ -53,7 +53,7 @@ document.getElementById("app").innerHTML = `
 
 function onTimesUp() {
   clearInterval(timerInterval);
-  current_team = !current_team;
+  current_team = !current_team + 0;
   // timeLeft = TIME_LIMIT;
   // console.log("starting again")
   startTimer();

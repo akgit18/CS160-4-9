@@ -5,6 +5,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('phone', views.phone, name='phone'),
     path('<str:room_name>/', views.room, name='room'),
 
 ]

@@ -124,14 +124,16 @@
           <div id="app" style="float:center">
 
           </div>
-          <button id="timebtn" class="btn btn-success my-2" style="width:100%" onClick="startTimer()">Start Timer</button>
-          <div class="">
+          <!-- <button id="timebtn" class="btn btn-success my-2" style="width:100%" onClick="startTimer()">Start Timer</button> -->
+          <div class="my-2" id="0t">
             <h3 style="float:left">Team 1</h3>
             <h3 id="1p" style="float:right">Points: 0</h3>
           </div>
-          <button class="btn btn-success my-2" style="width:100%">c</button>
-          <button class="btn btn-success my-2" style="width:100%">d</button>
-          <div class="">
+          <!-- <button class="btn btn-success my-2" style="width:100%">c</button>
+          <button class="btn btn-success my-2" style="width:100%">d</button> -->
+          <br>
+          <br>
+          <div class="my-2" id="1t">
             <h3 style="float:left">Team 2</h3>
             <h3 id="2p" style="float:right">Points: 0</h3>
           </div>
@@ -185,18 +187,21 @@
         console.log("Received: " + JSON.stringify(received));
         // code 1: new user joins
         // code 2: team puts word
-        // code 3: user sets name
+        // code 3: user sets name == 1
         // code 4: user changes team
         // code 5: user finishes turn
-        // code 6: game start
+        // code 6: game start *
+        // code 7: user sets time *
         if (received.code == 1) {
           if (teampops[0] <= teampops[1]) {
             teams[received.uid] =  0;
             teampops[0]++;
+            document.getElementById('0t').innerHTML += ('<button class="btn btn-success my-2" style="width:100%">' + received.name +'</button>')
             console.log("User " + received.uid + " joined. Added to team 1.");
           } else {
             teams[received.uid] =  1;
             teampops[1]++;
+            document.getElementById('1t').innerHTML += ('<button class="btn btn-success my-2" style="width:100%">' + received.name +'</button>')
             console.log("User " + received.uid + " joined. Added to team 2.");
           }
         } else if (received.code == 2) {
@@ -215,6 +220,12 @@
         } else if (received.code == 6) {
           console.log("Starting Game");
           startTimer();
+        } else if (received.code == 7) {
+          console.log("Setting Time");
+          TIME_LIMIT = Number(received.time)
+          document.getElementById("base-timer-label").innerHTML = formatTime(
+            TIME_LIMIT
+          );
         }
     }
 
