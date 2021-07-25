@@ -57,7 +57,7 @@
       </div>
 
       <div class="input-group my-3" id="timeSpan">
-        <input id="timeField" type="text" class="form-control" placeholder="Time">
+        <input id="timeField" type="text" class="form-control" placeholder="Time (seconds)">
         <div class="input-group-append">
           <span class="input-group-text bg-success text-light" onClick="sendTime(document.getElementById('timeField').value)">Set Time</span>
         </div>
@@ -85,7 +85,7 @@
           <div class="input-group-append">
             <span id="hand" class="input-group-text bg-success text-light"><i>Hand</i></span>
           </div>
-          <input id="letterstosend" type="text" class="form-control" placeholder="Letters to send">
+          <input id="letterstosend" type="text" class="form-control" placeholder="Letters to use">
           <div class="input-group-append">
             <span id="sendhand" class="input-group-text bg-success text-light" onClick="sendLetters(document.getElementById('letterstosend').value)"><i>Use</i></span>
           </div>
@@ -178,6 +178,13 @@
       if (!word) {
         console.log("Word too short.");
       } else {
+        for (letter of word) {
+          if (!usableLetters.includes(letter.toUpperCase())) {
+            console.log("You don't have those letters.");
+            console.log(usableLetters);
+            return
+          }
+        }
         socket.send(JSON.stringify({
              "uid" : uid,
              "code": 2,
@@ -200,6 +207,12 @@
         console.log("No letters to send.");
       } else {
         for (letter of letters) {
+          if (!hand.includes(letter.toUpperCase())) {
+            console.log("You don't have those letters.");
+            return
+          }
+        }
+        for (letter of letters) {
           hand = hand.replace(letter.toUpperCase(), "");
         }
         socket.send(JSON.stringify({
@@ -208,6 +221,7 @@
              "letters": letters,
              "teamnum": teamnum
             }));
+        document.getElementById("letterstosend").value = ""
         $("#sendhandgroup").hide();
         $("#wordgroup").show();
       }
@@ -265,7 +279,7 @@
           }
         } else if (received.code==9) {
           if (teamnum==received.teamnum) {
-            usableLetters += received.letters;
+            usableLetters += received.letters.toUpperCase();
             showUsableLetters();
           }
         } else if (received.code==10) {
