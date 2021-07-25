@@ -124,14 +124,16 @@
             <input type="text" value="3" class="timer-sq" id="sec2">
             <input type="text" value="0" class="timer-sq" id="sec1">
           </span> -->
-          <div id="app" style="float:center">
-
-          </div>
-          <!-- <button id="timebtn" class="btn btn-success my-2" style="width:100%" onClick="startTimer()">Start Timer</button> -->
           <div class="my-2" id="0t">
             <h3 style="float:left">Team 1</h3>
             <h3 id="1p" style="float:right">Points: 0</h3>
           </div>
+
+          <div id="app" style="float:center">
+
+          </div>
+          <!-- <button id="timebtn" class="btn btn-success my-2" style="width:100%" onClick="startTimer()">Start Timer</button> -->
+
           <!-- <button class="btn btn-success my-2" style="width:100%">c</button>
           <button class="btn btn-success my-2" style="width:100%">d</button> -->
           <br>
@@ -145,11 +147,11 @@
     </div>
 </body>
 <script type="text/javascript" src="{% static 'game/js/letters.js' %}"></script>
-<script type="text/javascript" src="{% static 'game/js/timer.js' %}"></script>
+
 <script>
 
 
-    // var uid = Date.now() % 10000;
+    var uid = Date.now() % 10000;
     const teams = {};
     const teampops = [0,0];
     var current_team = 0;
@@ -255,4 +257,5 @@
     };
 
 </script>
+<script type="text/javascript" src="{% static 'game/js/timer.js' %}"></script>
 </html>

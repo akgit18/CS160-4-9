@@ -8,19 +8,20 @@
 
     <link rel="stylesheet" type="text/css" href="{% static 'game/vendor/bootstrap/css/bootstrap.min.css' %}">
     <script type="text/javascript" src="{% static 'game/vendor/jquery/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'game/vendor/jquery-ui/jquery-ui.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'game/vendor/paper/paper-full.min.js' %}"></script>
     <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0">
     <style type="text/css">
-      input {
-        /* width: 5.8vh;
+      /* input {
+        width: 5.8vh;
         height: 5.8vh;
         text-align: center;
         padding: 0px;
         font-size: 5vh;
         background-color: rgba(222,184,135,0.4);
-        border: 0px; */
+        border: 0px;
         width: 50%;
-      }
+      } */
       table {
         background-image: url("{% static 'game/images/img5.svg' %}");
         background-repeat: no-repeat;
@@ -38,6 +39,10 @@
       }
       .nodpad {
         background-color: rgba(222,184,135,0.4);
+      }
+      .letter-tile {
+        height: 5.8vw;
+        width: 5.8vw;
       }
     </style>
 </head>
@@ -67,14 +72,24 @@
         <input id="nameField" type="text" value="" style="float:left" class="my-2">
         <button type="button" style="float:right" class="btn btn-success my-2" onClick="sendName(document.getElementById('nameField').value)">Set Name</button>
       </span> -->
-      <br>
-      <br>
-      <br>
-      <div class="" style="width:100%">
-        <div class="" id="hand" style="width:100%">
+      <!-- <div class="" style="width:100%">
+        <div class="" id="hand" style="width:100%; border: 1px grey;">
 
         </div>
+        <div class="" id="ltoSend" style="width:100%; border: 1px grey;">
 
+        </div>
+      </div> -->
+      <div id="sendhandgroup" class="row text-center" style="width:100%; margin:auto;">
+        <div class="input-group my-3">
+          <div class="input-group-append">
+            <span id="hand" class="input-group-text bg-success text-light"><i>Hand</i></span>
+          </div>
+          <input type="text" class="form-control" placeholder="Letters to send">
+          <div class="input-group-append">
+            <span id="sendhand" class="input-group-text bg-success text-light" onClick="sendLetters"><i>Use</i></span>
+          </div>
+        </div>
       </div>
       <div class="row text-center" style="width:100%; margin:auto;">
         <div class="col-4">
@@ -92,6 +107,16 @@
           <button type="button" class="btn btn-success dpad my-2" onClick="sendMove(0,1)">→</button>
           <button type="button" class="btn nodpad my-2"> </button>
         </div>
+
+        <div id="wordgroup" class="row text-center" style="width:100%; margin:auto;">
+          <div class="input-group my-3">
+            <div class="input-group-append">
+              <span id="usableLetters" class="input-group-text bg-success text-light"><i>Letters</i></span>
+            </div>
+            <input type="text" class="form-control" placeholder="Word to send">
+          </div>
+        </div>
+
       </div>
     </div>
 </body>
@@ -99,6 +124,7 @@
 <script type="text/javascript" src="{% static 'game/js/timer.js' %}"></script> -->
 <script>
     var uid = Date.now() % 10000;
+    var usableLetters = "";
     // var randColor = "#"+((Math.round(Math.random()*16777215)).toString(16));
     // paths[uid].strokeColor = randColor;
     var url = window.location.href;
@@ -144,7 +170,7 @@
 
     function sendWord(word, dir) {
       if (!word) {
-        console.log("Time too short.");
+        console.log("Word too short.");
       } else {
         socket.send(JSON.stringify({
              "uid" : uid,
@@ -152,8 +178,25 @@
              "word": word,
              "dir" : dir
             }));
+        usableLetters = "";
       }
     }
+
+    function sendLetters(letters) {
+      if (!letters) {
+        console.log("No letters to send.");
+      } else {
+        socket.send(JSON.stringify({
+             "uid" : uid,
+             "code": 9,
+             "letters": letters,
+             "teamnum": teamnum
+            }));
+        $("#sendhandgroup").hide();
+      }
+    }
+
+
 
     function sendMove(dir, val) {
       socket.send(JSON.stringify({
@@ -166,6 +209,26 @@
     }
 
     var teamnum = -1;
+    var hand = "";
+
+    function refillHand() {
+      while (hand.length < 7) {
+        let letternew = String.fromCharCode(Math.floor(Math.random()*26)+65)
+        hand += letternew;
+        // document.getElementById('hand').innerHTML += ("<div class='letter-tile bg-success text-light ui-draggable'>" + letternew + "</div>")
+      }
+      document.getElementById('hand').innerHTML = hand
+    }
+
+    function myturn() {
+      refillHand();
+      //other stuff?
+      $("#sendhandgroup").show();
+    }
+
+    function showUsableLetters() {
+      document.getElementById('usableLetters').innerHTML = hand
+    }
 
     socket.onmessage = function(receivedMessage) {
         var received = JSON.parse(receivedMessage.data);
@@ -183,7 +246,12 @@
           }
         } else if (received.code==9) {
           if (teamnum==received.teamnum) {
-
+            usableLetters += received.letters;
+            showUsableLetters();
+          }
+        } else if (received.code==10) {
+          if (teamnum==received.teamnum) {
+            myturn();
           }
         }
     }

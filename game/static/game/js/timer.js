@@ -59,8 +59,17 @@ function onTimesUp() {
   startTimer();
 }
 
+function notifyTurn() {
+  socket.send(JSON.stringify({
+       "uid" : uid,
+       "code": 10,
+       "teamnum": current_team
+      }));
+}
+
 function startTimer() {
   // console.log("starting")
+  notifyTurn();
   timeLeft = TIME_LIMIT;
   timePassed = 0;
   timerInterval = setInterval(() => {
