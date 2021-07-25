@@ -178,13 +178,13 @@
       if (!word) {
         console.log("Word too short.");
       } else {
-        for (letter of word) {
-          if (!usableLetters.includes(letter.toUpperCase())) {
-            console.log("You don't have those letters.");
-            console.log(usableLetters);
-            return
-          }
-        }
+        // for (letter of word) {
+        //   if (!usableLetters.includes(letter.toUpperCase())) {
+        //     console.log("You don't have those letters.");
+        //     console.log(usableLetters);
+        //     return
+        //   }
+        // }
         socket.send(JSON.stringify({
              "uid" : uid,
              "code": 2,
