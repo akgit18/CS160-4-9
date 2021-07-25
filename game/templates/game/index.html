@@ -31,6 +31,9 @@
       .time-sq {
 
       }
+      .current-sq {
+        background-color: rgba(240,233,36,0.8);
+      }
     </style>
     <style type="text/css">
       .base-timer {
@@ -146,7 +149,7 @@
 <script>
 
 
-    var uid = Date.now() % 10000;
+    // var uid = Date.now() % 10000;
     const teams = {};
     const teampops = [0,0];
     var current_team = 0;
@@ -181,14 +184,22 @@
     //     console.log('tick!', time);
     //   });
     // }
+    function confirmAdd(teamnum, idnum) {
+      socket.send(JSON.stringify({
+           "uid" : idnum,
+           "code": 8,
+           "teamnum": teamnum
+          }));
+    }
+
 
     socket.onmessage = function(receivedMessage) {
         var received = JSON.parse(receivedMessage.data);
         console.log("Received: " + JSON.stringify(received));
         // code 1: new user joins *
         // code 2: team puts word
-        // code 3: user sets name == 1
-        // code 4: user changes team
+        // code 3: user moves position of word-to-be
+        // code 4: user changes team meh
         // code 5: user finishes turn
         // code 6: game start *
         // code 7: user sets time *
@@ -196,36 +207,44 @@
           if (teampops[0] <= teampops[1]) {
             teams[received.uid] =  0;
             teampops[0]++;
+            confirmAdd(0, received.uid);
             document.getElementById('0t').innerHTML += ('<button class="btn btn-success my-2" style="width:100%">' + received.name +'</button>')
             console.log("User " + received.uid + " joined. Added to team 1.");
           } else {
             teams[received.uid] =  1;
             teampops[1]++;
+            confirmAdd(1, received.uid);
             document.getElementById('1t').innerHTML += ('<button class="btn btn-success my-2" style="width:100%">' + received.name +'</button>')
             console.log("User " + received.uid + " joined. Added to team 2.");
           }
         } else if (received.code == 2) {
           if (current_team == teams[received.uid]) {
-            // todo: global vars for pos
-            // placeword(received.word, i, j, received.dir);
+            receiveWord(received.word, received.dir);
           } else {
             console.log("It is not yet your turn");
           }
         } else if (received.code == 3) {
-          console.log("a")
+          document.getElementById(posx+','+posy).classList.remove("current-sq");
+          if (received.dir) {
+            posx+=received.val;
+          } else {
+            posy+=received.val;
+          }
+          document.getElementById(posx+','+posy).classList.add("current-sq");
+          console.log("Moved pos to: " + posx + ", " + posy);
         } else if (received.code == 4) {
-          let t1 = teams[received.uid];
+          // let t1 = teams[received.uid];
+          0+0;
         } else if (received.code == 5) {
-          let t1 = teams[received.uid];
+          // let t1 = teams[received.uid];
+          0+0;
         } else if (received.code == 6) {
           console.log("Starting Game");
           startTimer();
         } else if (received.code == 7) {
           console.log("Setting Time");
           TIME_LIMIT = Number(received.time)
-          document.getElementById("base-timer-label").innerHTML = formatTime(
-            TIME_LIMIT
-          );
+          document.getElementById("base-timer-label").innerHTML = formatTime(TIME_LIMIT);
         }
     }
 

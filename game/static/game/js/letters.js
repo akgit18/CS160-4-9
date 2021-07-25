@@ -85,6 +85,13 @@ const freqdict = {
   "Z": 1
 }
 
+var posx = 7;
+var posy = 7;
+document.getElementById(posx+','+posy).classList.add("current-sq");
+function receiveWord(word, dir) {
+  placeword(word, posx, posy, dir)
+}
+
 function placeword(word, i, j, dir) {
   // 1 = downward, 0 = rightward
   let wordscore=0;

@@ -12,14 +12,14 @@
     <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0">
     <style type="text/css">
       input {
-        width: 5.8vh;
+        /* width: 5.8vh;
         height: 5.8vh;
         text-align: center;
         padding: 0px;
         font-size: 5vh;
         background-color: rgba(222,184,135,0.4);
-        border: 0px;
-        /* background-color: transparent; */
+        border: 0px; */
+        width: 50%;
       }
       table {
         background-image: url("{% static 'game/images/img5.svg' %}");
@@ -31,29 +31,74 @@
       .time-sq {
 
       }
+      .dpad, .nodpad {
+        width: 20vw;
+        height: 20vw;
+        text-align: center;
+      }
+      .nodpad {
+        background-color: rgba(222,184,135,0.4);
+      }
     </style>
 </head>
 <body>
     <div class="container-fluid m2" style="width:100%">
-      <span>
+      <!-- https://getbootstrap.com/docs/4.0/components/input-group/ -->
+      <div class="input-group my-3" id="nameSpan">
+        <input id="nameField" type="text" class="form-control" placeholder="Name">
+        <div class="input-group-append">
+          <span class="input-group-text bg-success text-light" onClick="sendName(document.getElementById('nameField').value)">Set Name</span>
+        </div>
+      </div>
+
+      <div class="input-group my-3" id="timeSpan">
+        <input id="timeField" type="text" class="form-control" placeholder="Time">
+        <div class="input-group-append">
+          <span class="input-group-text bg-success text-light" onClick="sendTime(document.getElementById('timeField').value)">Set Time</span>
+        </div>
+      </div>
+
+      <!-- <span id="timeSpan">
         <input id="timeField" type="text" value="" style="float:left" class="my-2">
         <button type="button" style="float:right" class="btn btn-success my-2" onClick="sendTime(document.getElementById('timeField').value)">Set Time</button>
-      </span>
-      <button type="button" class="btn btn-success my-2" onClick="startGame()" style="width:100%">Start Game</button>
-      <span id="nameSpan">
+      </span> -->
+      <button id="startbtn" type="button" class="btn btn-success my-2" onClick="startGame()" style="width:100%">Start Game</button>
+      <!-- <span id="nameSpan">
         <input id="nameField" type="text" value="" style="float:left" class="my-2">
         <button type="button" style="float:right" class="btn btn-success my-2" onClick="sendName(document.getElementById('nameField').value)">Set Name</button>
-      </span>
+      </span> -->
+      <br>
+      <br>
+      <br>
+      <div class="" style="width:100%">
+        <div class="" id="hand" style="width:100%">
+
+        </div>
+
+      </div>
+      <div class="row text-center" style="width:100%; margin:auto;">
+        <div class="col-4">
+          <button type="button" class="btn nodpad my-2"> </button>
+          <button type="button" class="btn btn-success dpad my-2" onClick="sendMove(0,-1)">←</button>
+          <button type="button" class="btn nodpad my-2"> </button>
+        </div>
+        <div class="col-4">
+          <button type="button" class="btn btn-success dpad my-2" onClick="sendMove(1,-1)">↑</button>
+          <button type="button" class="btn btn-success dpad my-2">Place</button>
+          <button type="button" class="btn btn-success dpad my-2" onClick="sendMove(1,1)">↓</button>
+        </div>
+        <div class="col-4">
+          <button type="button" class="btn nodpad my-2"> </button>
+          <button type="button" class="btn btn-success dpad my-2" onClick="sendMove(0,1)">→</button>
+          <button type="button" class="btn nodpad my-2"> </button>
+        </div>
+      </div>
     </div>
 </body>
 <!-- <script type="text/javascript" src="{% static 'game/js/letters.js' %}"></script>
 <script type="text/javascript" src="{% static 'game/js/timer.js' %}"></script> -->
 <script>
-
-
     var uid = Date.now() % 10000;
-
-
     // var randColor = "#"+((Math.round(Math.random()*16777215)).toString(16));
     // paths[uid].strokeColor = randColor;
     var url = window.location.href;
@@ -63,15 +108,6 @@
 
     var socket = new WebSocket(
         'ws://' + window.location.host + '/ws/game');
-
-    // tool.onMouseMove = function(event) { //http://paperjs.org/reference/tool/ path examples
-    //   if (size=="small") {
-    //     paths[uid].add(event.point);
-    //     socket.send(JSON.stringify({
-    //      "uid" : uid
-    //     }));
-    //   }
-    // }
 
     function startGame() {
       socket.send(JSON.stringify({
@@ -106,61 +142,57 @@
       }
     }
 
-    // function startTimer() {
-    //   let min2 = Number(document.getElementById('min2')) * 600000;
-    //   let min1 = Number(document.getElementById('min1')) * 60000;
-    //   let sec1 = Number(document.getElementById('sec1')) * 1000;
-    //   let sec2 = Number(document.getElementById('sec2')) * 10000;
-    //   let t = min2 + min1 + sec2 + sec1;
-    //   // Create an animation callback every second:
-    //   animationInterval(1000, controller.signal, time => {
-    //     console.log('tick!', time);
-    //   });
-    // }
+    function sendWord(word, dir) {
+      if (!word) {
+        console.log("Time too short.");
+      } else {
+        socket.send(JSON.stringify({
+             "uid" : uid,
+             "code": 2,
+             "word": word,
+             "dir" : dir
+            }));
+      }
+    }
+
+    function sendMove(dir, val) {
+      socket.send(JSON.stringify({
+           "uid" : uid,
+           "code": 3,
+           "val": val,
+           "dir" : dir
+          }));
+
+    }
+
+    var teamnum = -1;
 
     socket.onmessage = function(receivedMessage) {
         var received = JSON.parse(receivedMessage.data);
         console.log("Received: " + JSON.stringify(received));
-        // code 1: new user joins
-        // code 2: team puts word
-        // code 3: user sets name
-        // code 4: user changes team
-        // code 5: user finishes turn
         // code 6: game start
-        // if (received.code == 1) {
-        //   if (teampops[0] <= teampops[1]) {
-        //     teams[received.uid] =  0;
-        //     teampops[0]++;
-        //     console.log("User " + received.uid + " joined. Added to team 1.");
-        //   } else {
-        //     teams[received.uid] =  1;
-        //     teampops[1]++;
-        //     console.log("User " + received.uid + " joined. Added to team 2.");
-        //   }
-        // } else if (received.code == 2) {
-        //   if (current_team == teams[received.uid]) {
-        //     // todo: global vars for pos
-        //     // placeword(received.word, i, j, received.dir);
-        //   } else {
-        //     console.log("It is not yet your turn");
-        //   }
-        // } else if (received.code == 3) {
-        //   console.log("a")
-        // } else if (received.code == 4) {
-        //   let t1 = teams[received.uid];
-        // } else if (received.code == 5) {
-        //   let t1 = teams[received.uid];
-        // } else if (received.code == 6) {
-        //   console.log("Starting Game");
-        //   startTimer();
-        // }
+        // code 8: received team #
+        // code 9: letters received
+        if (received.code == 6) {
+          document.getElementById('startbtn').style.display = "none";
+          document.getElementById('timeSpan').style.display = "none";
+          console.log("Game Started!");
+        } else if (received.code == 8) {
+          if (uid==received.uid) {
+            teamnum = received.teamnum;
+          }
+        } else if (received.code==9) {
+          if (teamnum==received.teamnum) {
+
+          }
+        }
     }
-
-
 
     socket.onclose = function(e) {
         console.error('Chat socket closed unexpectedly');
     };
+
+
 
 </script>
 </html>
