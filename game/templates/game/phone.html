@@ -85,9 +85,9 @@
           <div class="input-group-append">
             <span id="hand" class="input-group-text bg-success text-light"><i>Hand</i></span>
           </div>
-          <input type="text" class="form-control" placeholder="Letters to send">
+          <input id="letterstosend" type="text" class="form-control" placeholder="Letters to send">
           <div class="input-group-append">
-            <span id="sendhand" class="input-group-text bg-success text-light" onClick="sendLetters"><i>Use</i></span>
+            <span id="sendhand" class="input-group-text bg-success text-light" onClick="sendLetters(document.getElementById('letterstosend').value)"><i>Use</i></span>
           </div>
         </div>
       </div>
@@ -99,7 +99,7 @@
         </div>
         <div class="col-4">
           <button type="button" class="btn btn-success dpad my-2" onClick="sendMove(1,-1)">↑</button>
-          <button type="button" class="btn btn-success dpad my-2">Place</button>
+          <button type="button" class="btn btn-success dpad my-2" onClick="sendWord(document.getElementById('wordToSend').value, Number(document.getElementById('wordDirection').value))">Place</button>
           <button type="button" class="btn btn-success dpad my-2" onClick="sendMove(1,1)">↓</button>
         </div>
         <div class="col-4">
@@ -113,8 +113,13 @@
             <div class="input-group-append">
               <span id="usableLetters" class="input-group-text bg-success text-light"><i>Letters</i></span>
             </div>
-            <input type="text" class="form-control" placeholder="Word to send">
+            <input id="wordToSend" type="text" class="form-control" placeholder="Word to send">
           </div>
+
+          <select id="wordDirection" class="form-select" name="">
+            <option value="0">Horizontal</option>
+            <option value="1">Vertical</option>
+          </select>
         </div>
 
       </div>
@@ -123,6 +128,7 @@
 <!-- <script type="text/javascript" src="{% static 'game/js/letters.js' %}"></script>
 <script type="text/javascript" src="{% static 'game/js/timer.js' %}"></script> -->
 <script>
+    $("#wordgroup").hide();
     var uid = Date.now() % 10000;
     var usableLetters = "";
     // var randColor = "#"+((Math.round(Math.random()*16777215)).toString(16));
@@ -176,16 +182,26 @@
              "uid" : uid,
              "code": 2,
              "word": word,
-             "dir" : dir
+             "dir" : dir,
+             "teamnum": teamnum
             }));
-        usableLetters = "";
+        removeWordContent();
       }
+    }
+
+    function removeWordContent() {
+      usableLetters = "";
+      $("#wordgroup").hide();
+      document.getElementById('wordToSend').value="";
     }
 
     function sendLetters(letters) {
       if (!letters) {
         console.log("No letters to send.");
       } else {
+        for (letter of letters) {
+          hand = hand.replace(letter.toUpperCase(), "");
+        }
         socket.send(JSON.stringify({
              "uid" : uid,
              "code": 9,
@@ -193,6 +209,7 @@
              "teamnum": teamnum
             }));
         $("#sendhandgroup").hide();
+        $("#wordgroup").show();
       }
     }
 
@@ -223,11 +240,13 @@
     function myturn() {
       refillHand();
       //other stuff?
+      usableLetters = "";
+      $("#wordgroup").hide();
       $("#sendhandgroup").show();
     }
 
     function showUsableLetters() {
-      document.getElementById('usableLetters').innerHTML = hand
+      document.getElementById('usableLetters').innerHTML = usableLetters;
     }
 
     socket.onmessage = function(receivedMessage) {
@@ -252,6 +271,10 @@
         } else if (received.code==10) {
           if (teamnum==received.teamnum) {
             myturn();
+          }
+        } else if (received.code==2) {
+          if (teamnum==received.teamnum) {
+            removeWordContent();
           }
         }
     }
